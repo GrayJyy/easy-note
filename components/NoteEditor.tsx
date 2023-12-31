@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo, useReducer } from 'react'
+import React, { useEffect, useMemo, useReducer } from 'react'
 import { useFormState } from 'react-dom'
 import { deleteNote, saveNote } from '../app/actions/actions'
 import NotePreview from './NotePreview'
@@ -35,11 +35,22 @@ const reducer = (state: InitialState, action: { type: 'add'; payload: InitialSta
 }
 
 const NoteEditor = ({ noteId, initialTitle, initialBody }: Props) => {
-  const [saveState, saveFormAction] = useFormState<FormStat, FormData>(saveNote, { success: false, message: '' })
+  const [saveState, saveFormAction] = useFormState<FormStat, FormData>(saveNote, {
+    success: false,
+    message: '',
+    errors: [],
+  })
   const [delState, delFormAction] = useFormState<void, FormData>(deleteNote, undefined)
   const isDraft = useMemo(() => noteId === null, [noteId])
   const [state, dispatch] = useReducer(reducer, initialState, () => init({ title: initialTitle, body: initialBody }))
   const { title, body } = state
+
+  useEffect(() => {
+    if (saveState.errors.length) {
+      // 处理错误
+      console.error(saveState.errors)
+    }
+  }, [saveState])
 
   return (
     <div className='note-editor'>
