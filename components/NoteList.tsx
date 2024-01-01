@@ -1,6 +1,8 @@
 import React from 'react'
 import { getAllNotes } from '@/lib/redis'
-import SidebarNoteItem from './SidebarNoteItem'
+import SidebarNoteListFilter from './SidebarNoteListFilter'
+import SidebarNoteItem from '@/components/SidebarNoteItem'
+import SidebarNoteItemHeader from './SidebarNoteItemHeader'
 
 const NoteList = async () => {
   const notes = await getAllNotes()
@@ -10,15 +12,16 @@ const NoteList = async () => {
   if (arr.length === 0) return <div className='notes-empty'>No notes created yet!</div>
 
   return (
-    <ul className='notes-list'>
-      {arr.map(([noteId, note]) => {
-        return (
-          <li key={noteId}>
-            <SidebarNoteItem noteId={noteId} note={JSON.parse(note)} />
-          </li>
-        )
+    <SidebarNoteListFilter
+      notes={Object.entries(notes).map(([noteId, note]) => {
+        const noteData = JSON.parse(note)
+        return {
+          noteId,
+          note: noteData,
+          header: <SidebarNoteItemHeader title={noteData.title} updateTime={noteData.updateTime} />,
+        }
       })}
-    </ul>
+    />
   )
 }
 
